@@ -3,12 +3,23 @@ Laptop
 
 Laptop is a script to set up linux servers and laptops with a Rails environment. It was forked from the Thoughtbot script of the same name after they dropped linux support.
 
+This script is useful for server deployments as well so I've created seperate versions for those environments.
+
+linux == A generic linux laptop. It can feasibly have the text editing software added back and allow the database to exist on the same machine.
+
+development_server == Remove text editing and allow the database to exist on the same machine.
+
+production_server == No text editing or database.
+
+I get that puppet or chef is a more accepted way of automating this. :)
+
 Requirements
 ------------
 
 We support:
 
 Ubuntu 14
+
 Ubuntu 15
 
 Install
