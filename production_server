@@ -52,6 +52,9 @@ fancy_echo "Updating system packages ..."
 fancy_echo "Installing git, for source control management ..."
   sudo aptitude install -y git
 
+fancy_echo "Installing ntp"
+  sudo aptitude install -y ntp
+
 fancy_echo "Installing base ruby build dependencies ..."
   sudo aptitude build-dep -y ruby2.1
 
