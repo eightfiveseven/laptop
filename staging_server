@@ -63,6 +63,10 @@ fancy_echo "Installing sqlite3, for prototyping database-backed rails apps"
 
 fancy_echo "Installing build-essential"
  sudo aptitude install -y build-essential
+
+fancy_echo "Installing memcached"
+ sudo aptitude install -y memcached
+
 # we don't really use this
 # fancy_echo "Installing Postgres, a good open source relational database ..."
 # sudo aptitude install -y postgresql postgresql-server-dev-all
