@@ -1,0 +1,86 @@
+#!/usr/bin/env bash
+### end common-components/bash-shebang
+
+# ASSUMPTIONS
+# 1. Zsh is your current shell
+# 2. Git is already installed
+
+# Welcome to the Tripcraft Rails deployment script. We forked the Thoughtbot script
+# after they abandoned linux support.
+
+trap 'ret=$?; test $ret -ne 0 && printf "failed\n\n" >&2; exit $ret' EXIT
+
+set -e
+### end common-components/exit-trap
+
+if [[ ! -d "$HOME/.bin/" ]]; then
+  mkdir "$HOME/.bin"
+fi
+
+if [ ! -f "$HOME/.zshrc" ]; then
+  touch $HOME/.zshrc
+fi
+
+if [[ ":$PATH:" != *":$HOME/.bin:"* ]]; then
+  printf 'export PATH="$HOME/.bin:$PATH"\n' >> ~/.zshrc
+  export PATH="$HOME/.bin:$PATH"
+fi
+### end common-components/check-home-bin
+
+fancy_echo() {
+  printf "\n%b\n" "$1"
+}
+### end common-components/shared-functions
+
+if ! grep -qiE 'precise|quantal|wheezy|raring|jessie|saucy|trusty' /etc/os-release; then
+  fancy_echo "Sorry! we don't currently support that distro."
+  exit 1
+fi
+### end linux-components/distro-check
+
+fancy_echo "Updating system packages ..."
+  if command -v aptitude >/dev/null; then
+    fancy_echo "Using aptitude ..."
+  else
+    fancy_echo "Installing aptitude ..."
+    sudo apt-get install -y aptitude
+  fi
+
+  sudo aptitude update
+### end linux-components/debian-package-update
+
+fancy_echo "Installing ntp"
+  sudo aptitude install -y ntp
+
+fancy_echo "Installing libraries for common gem dependencies ..."
+  sudo aptitude install -y libxslt1-dev libcurl4-openssl-dev libksba8 libksba-dev libqtwebkit-dev libreadline-dev
+
+fancy_echo "Installing build-essential"
+ sudo aptitude install -y build-essential
+
+ fancy_echo "Installing Postgres, a good open source relational database ..."
+ sudo aptitude install -y postgresql postgresql-server-dev-all
+
+fancy_echo "Installing curl ..."
+  sudo aptitude install -y curl
+
+fancy_echo "Installing pg dev libraries ..."
+  sudo aptitude install -y libpq-dev
+
+# ATTEMPTS TO INSTALL NGINX
+# Install Phusion's PGP key to verify packages
+gpg --keyserver keyserver.ubuntu.com --recv-keys 561F9B9CAC40B2F7
+gpg --armor --export 561F9B9CAC40B2F7 | sudo apt-key add -
+
+# Add HTTPS support to APT
+sudo apt-get install apt-transport-https
+
+# Add the passenger repository
+sudo sh -c "echo 'deb https://oss-binaries.phusionpassenger.com/apt/passenger trusty main' >> /etc/apt/sources.list.d/passenger.list"
+sudo chown root: /etc/apt/sources.list.d/passenger.list
+sudo chmod 600 /etc/apt/sources.list.d/passenger.list
+sudo apt-get update
+
+# Install nginx and passenger
+sudo apt-get -y install nginx-full passenger
+
